@@ -59,10 +59,13 @@ public class PrefActivity extends PreferenceActivity {
     public void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         Helper.setTheme(this);
+
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.preferences);
         setContentView(R.layout.preferences);
+        Helper.applySystemBarInsets(this);
+        Helper.applyPreferenceScreenDialogInsets(this);
         mService = StorageService.getInstance();
     }
 

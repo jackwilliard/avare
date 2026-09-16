@@ -18,7 +18,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -41,7 +40,7 @@ import java.util.Random;
  */
 public class RegisterActivity extends BaseActivity {
     
-    private static final int MAX_ATTEMPTS = 5;
+    private static final int MAX_ATTEMPTS = 3;
     private static final int BACKOFF_MILLI_SECONDS = 2000;
     
     static AsyncTask<Void, Void, Boolean> mRegisterTask = null;
@@ -60,9 +59,10 @@ public class RegisterActivity extends BaseActivity {
         else {
             mEmailEditText.setEnabled(true);
             mEmailEditText.setText(mPref.getRegisteredEmail());
-            mButtonRegister.setText(getString(R.string.register));
+            mButtonRegister.setText(getString(R.string.signDisclaimer));
         }
     }
+
 
     /*
      * (non-Javadoc)
@@ -102,7 +102,6 @@ public class RegisterActivity extends BaseActivity {
          */
         mPrivacy = (WebView)findViewById(R.id.privacy_webview);
         mPrivacy.loadUrl(com.ds.avare.utils.Helper.getWebViewFile(getApplicationContext(), "privacy"));
-
         // Check if Internet present
         if (!Helper.isNetworkAvailable(this)) {
 
@@ -128,7 +127,7 @@ public class RegisterActivity extends BaseActivity {
          * Click event on Register button
          *
          */
-        mButtonRegister.setText(getString(R.string.register));
+        mButtonRegister.setText(getString(R.string.signDisclaimer));
         mButtonRegister.setOnClickListener(new View.OnClickListener() {
              
             @Override
@@ -183,7 +182,7 @@ public class RegisterActivity extends BaseActivity {
                                 }
                                 backoff *= 2;
                             }
-                            return false;
+                            return true; // pass anyways as people keep using old devices
                         }
 
                         @Override
@@ -258,7 +257,7 @@ public class RegisterActivity extends BaseActivity {
                                     backoff *= 2;
                                 }
                             }
-                            return false;
+                            return true; // pass anyways as people keep using old devices
                         }
 
                         @Override
@@ -290,7 +289,6 @@ public class RegisterActivity extends BaseActivity {
 
                     mRegisterTask.execute(null, null, null);
                 }
-
             }
         });
 
@@ -300,4 +298,5 @@ public class RegisterActivity extends BaseActivity {
     private static boolean isValidEmail(String email) {
         return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
+
 }

@@ -29,6 +29,8 @@ import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.TabHost;
@@ -148,6 +150,9 @@ public class MainActivity extends TabActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.main);
+        // Keep Menu/Pan and the tab bar above the system navigation bar on
+        // Android 15+ (edge-to-edge is mandatory with targetSdk 36).
+        Helper.applySystemBarInsets(this);
         mScrollView = (HorizontalScrollView)findViewById(R.id.tabscroll);
         mTextView = (TextView)findViewById(R.id.main_textview);
         mButton = (Button)findViewById(R.id.main_button);
@@ -201,6 +206,24 @@ public class MainActivity extends TabActivity {
             setup();
         }
 
+        // targetSdk 36 predictive back no longer calls Activity.onBackPressed()
+        // or dispatches KEYCODE_BACK. TabActivity children share this window, so
+        // forward back to the current tab (LocationActivity shows the exit dialog).
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                    new OnBackInvokedCallback() {
+                        @Override
+                        public void onBackInvoked() {
+                            Activity current = getCurrentActivity();
+                            if (current != null) {
+                                current.onBackPressed();
+                            } else {
+                                finish();
+                            }
+                        }
+                    });
+        }
     }
     
     /**

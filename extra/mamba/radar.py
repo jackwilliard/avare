@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #Copyright (c) 2021, Apps4Av Inc. (apps4av@gmail.com) 
 #All rights reserved.
 #
@@ -13,7 +13,7 @@
 #
 
 import requests
-import bs4
+from bs4 import BeautifulSoup
 import re
 import os 
 import datetime
@@ -25,7 +25,7 @@ os.system('rm -f CONUS_L2_CREF* conus *latest_radaronly* conus.zip latest.txt')
 url = 'https://mrms.ncep.noaa.gov/data/RIDGEII/L2/CONUS/CREF_QCD/'
 
 #parse html
-soup = bs4.BeautifulSoup(requests.get(url).text, 'lxml')
+soup = BeautifulSoup(requests.get(url).text, 'lxml')
 table = soup.find('table')
 listOfFiles = []
 
@@ -37,7 +37,7 @@ for row in rows:
         floc = td[0].find('a').get('href')
         if None != floc:
             # parse time out of file names
-            fm = re.search("^CONUS_L2_CREF_QCD_(\d*)_(\d*).tif.gz$", floc)
+            fm = re.search("^CONUS_L2_CREF_QCD_([0-9]*)_([0-9]*).tif.gz$", floc)
             if None != fm:
                 datetimeStr = fm.group(1) + fm.group(2)
                 d = {}
